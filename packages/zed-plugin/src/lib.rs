@@ -23,13 +23,37 @@ impl RippleExtension {
             }
         }
 
+        // First, check for monorepo language server
+        if let Some(monorepo_path) = Self::monorepo_binary_path(worktree) {
+            self.cached_binary_path = Some(monorepo_path.clone());
+            return Ok(monorepo_path.to_string_lossy().into_owned());
+        }
+
+        // Then check system path
         if let Some(system_path) = Self::system_binary_path(worktree) {
             self.cached_binary_path = Some(system_path.clone());
             return Ok(system_path.to_string_lossy().into_owned());
         }
 
+        // Finally, install from npm if needed
         let binary_path = self.install_language_server(language_server_id)?;
         Ok(binary_path.to_string_lossy().into_owned())
+    }
+
+    fn monorepo_binary_path(worktree: &zed::Worktree) -> Option<PathBuf> {
+        // Check if we're in the Ripple monorepo by looking for the language-server package
+        let worktree_root = PathBuf::from(worktree.root_path());
+        let monorepo_binary = worktree_root
+            .join("packages")
+            .join("language-server")
+            .join("bin")
+            .join("language-server.js");
+
+        if fs::metadata(&monorepo_binary).map_or(false, |stat| stat.is_file()) {
+            return Some(monorepo_binary);
+        }
+
+        None
     }
 
     fn system_binary_path(worktree: &zed::Worktree) -> Option<PathBuf> {
@@ -219,11 +243,20 @@ impl zed::Extension for RippleExtension {
     ) -> Result<zed::Command, String> {
         let binary_path = self.language_server_binary_path(language_server_id, worktree)?;
 
-        Ok(zed::Command {
-            command: binary_path,
-            args: vec!["--stdio".to_string()],
-            env: worktree.shell_env(),
-        })
+        // If the binary is a .js file, run it with Node.js
+        if binary_path.ends_with(".js") {
+            Ok(zed::Command {
+                command: "node".to_string(),
+                args: vec![binary_path, "--stdio".to_string()],
+                env: worktree.shell_env(),
+            })
+        } else {
+            Ok(zed::Command {
+                command: binary_path,
+                args: vec!["--stdio".to_string()],
+                env: worktree.shell_env(),
+            })
+        }
     }
 }
 

@@ -51,13 +51,22 @@ Once published to the Zed extensions registry:
 
 ## Language Server Setup
 
-The extension automatically downloads the Ripple Language Server the first time it runs. The version is pinned via the `config` entry for `@ripple-ts/language-server` in this package's `package.json`. If you'd prefer to manage the dependency yourself, install it via npm:
+The extension automatically detects and uses the Ripple Language Server in the following priority order:
+
+1. **Monorepo language server** (if working in the Ripple repository): Uses `packages/language-server/bin/language-server.js`
+2. **System-wide installation**: Checks for globally installed `ripple-language-server`
+3. **Project-local installation**: Checks `node_modules/.bin/ripple-language-server`
+4. **Automatic download**: Downloads from npm the first time it runs
+
+For development in the Ripple monorepo, the extension will automatically use the local language server, making it easy to test changes without publishing.
+
+If you prefer to manage the language server yourself, install it via npm:
 
 ```bash
 npm install -g @ripple-ts/language-server
 ```
 
-Project-local installations (`node_modules/.bin/ripple-language-server`) are also detected automatically.
+The version downloaded automatically is pinned via the `config` entry for `@ripple-ts/language-server` in this package's `package.json`.
 
 ## Requirements
 

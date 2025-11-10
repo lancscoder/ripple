@@ -80,21 +80,44 @@ zed-ripple/
 
 ### After Grammar Changes
 
-If you update the tree-sitter grammar in `packages/tree-sitter`:
+If you update the tree-sitter grammar or query files in `packages/tree-sitter`:
 
-1. Update query files in `languages/ripple/` if needed
-2. Update the `rev` field in `extension.toml` to the new commit SHA
-3. Test locally
+1. **Copy updated query files** to the Zed extension:
+   ```bash
+   cd packages/zed-plugin
+   pnpm run copy-scm
+   ```
+   This copies all `.scm` files from `packages/tree-sitter/queries/` to `languages/ripple/`
+
+2. Update the `rev` field in `extension.toml` to the new commit SHA:
+   ```bash
+   git rev-parse HEAD
+   # Update rev in extension.toml with the output
+   ```
+
+3. Rebuild and test locally
 4. Bump version in `extension.toml`
-5. Submit PR to zed-extensions repo (if published)
+5. Commit the changes (including updated `.scm` files)
+6. Submit PR to zed-extensions repo (if published)
 
 ### After Language Server Changes
 
-The extension just launches the language server binary - no changes needed to the extension itself unless:
+When working in the Ripple monorepo, the extension automatically detects and uses the local language server at `packages/language-server/bin/language-server.js`. This means:
 
-- Binary name changes
+- **You can test language server changes immediately** without publishing or installing
+- **No need to rebuild the extension** when changing language server code
+- **Just reload the window** in Zed to pick up language server changes
+
+The extension searches for the language server in this order:
+1. Monorepo language server (`packages/language-server/bin/language-server.js`)
+2. System-wide installation (`ripple-language-server` in PATH)
+3. Project-local installation (`node_modules/.bin/ripple-language-server`)
+4. Automatic npm installation (first-time only)
+
+Changes to the extension itself are only needed if:
+- Binary name or location changes
 - Command-line arguments change
-- Installation method changes
+- Installation detection logic changes
 
 ## Troubleshooting
 
