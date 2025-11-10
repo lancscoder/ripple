@@ -1,6 +1,30 @@
 # Ripple Extension for Zed
 
-This extension provides Ripple language support for the [Zed editor](https://zed.dev).
+This extension provides comprehensive Ripple language support for the [Zed editor](https://zed.dev).
+
+## Features
+
+- **Syntax Highlighting**: Full tree-sitter-based syntax highlighting for Ripple's custom syntax
+  - Component and fragment declarations
+  - Reactive operators (`@`, `#[]`, `#{}`)
+  - JSX/TSX elements
+  - TypeScript integration
+- **IntelliSense**: Powered by the Ripple Language Server
+  - Autocomplete for components, functions, and variables
+  - Parameter hints
+  - Hover documentation
+  - Go to Definition
+  - Find All References
+  - Rename symbol
+- **Diagnostics**: Real-time TypeScript error checking
+- **Code Navigation**:
+  - Outline view showing components and functions
+  - Code folding for blocks and components
+  - Bracket matching
+- **Editing Features**:
+  - Auto-closing pairs for brackets, quotes, and JSX tags
+  - Comment toggling (`Cmd/Ctrl + /`)
+  - Language injection for CSS in `<style>` blocks
 
 ## Installation
 
@@ -34,3 +58,64 @@ npm install -g @ripple-ts/language-server
 ```
 
 Project-local installations (`node_modules/.bin/ripple-language-server`) are also detected automatically.
+
+## Requirements
+
+- Zed editor (latest version recommended)
+- Node.js and npm (for language server)
+- A Ripple project with proper configuration
+
+## Formatting
+
+The extension works with Ripple's Prettier plugin for code formatting. To enable formatting:
+
+1. Install Prettier and the Ripple plugin in your project:
+   ```bash
+   pnpm install --save-dev prettier @ripple-ts/prettier-plugin
+   ```
+
+2. Create a `.prettierrc` file in your project root:
+   ```json
+   {
+     "plugins": ["@ripple-ts/prettier-plugin"],
+     "overrides": [
+       {
+         "files": "*.ripple",
+         "options": {
+           "parser": "ripple"
+         }
+       }
+     ]
+   }
+   ```
+
+3. Enable "Format on Save" in Zed settings if desired.
+
+## Troubleshooting
+
+### Syntax highlighting not working
+
+- Ensure the extension is installed and enabled
+- Try reloading extensions: `Cmd/Ctrl + Shift + P` → "zed: reload extensions"
+- Check Zed logs: `Cmd/Ctrl + Shift + P` → "zed: open log"
+
+### Language server not starting
+
+- Verify Node.js is installed: `node --version`
+- Try installing the language server manually: `npm install -g @ripple-ts/language-server`
+- Check if the binary is accessible: `which ripple-language-server`
+- Review Zed logs for error messages
+
+### Formatting not working
+
+- Ensure Prettier and `@ripple-ts/prettier-plugin` are installed in your project
+- Verify `.prettierrc` configuration exists
+- Test formatting from command line: `prettier --write file.ripple`
+
+## Contributing
+
+Contributions are welcome! Please see the main [Ripple repository](https://github.com/Ripple-TS/ripple) for contribution guidelines.
+
+## License
+
+MIT

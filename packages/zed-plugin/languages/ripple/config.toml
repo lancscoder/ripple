@@ -4,9 +4,9 @@ path_suffixes = ["ripple"]
 line_comments = ["//"]
 block_comment = ["/*", "*/"]
 tab_size = 2
-hard_tabs = false
+hard_tabs = true
 
-autoclose_before = ";:.,=}])\""
+autoclose_before = ";:.,=}])>\" \n\t"
 
 brackets = [
   { start = "{", end = "}", close = true, newline = true },
